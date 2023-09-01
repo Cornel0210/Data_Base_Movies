@@ -1,9 +1,6 @@
 package db;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class DataSource {
     private static final String DB_NAME = "movies.db";
@@ -26,9 +23,33 @@ public class DataSource {
     public static final String COLUMN_GENRE_NAME = "genre";
     public static final String COLUMN_GENRE_MOVIE = "movie";
 
+    public static final String INSERT_INTO_MOVIES = "INSERT INTO " + TABLE_MOVIES + " VALUES(?, ?, ?)";
+    public static final String INSERT_INTO_ACTORS = "INSERT INTO " + TABLE_ACTORS + " VALUES(?, ?, ?)";
+    public static final String INSERT_INTO_GENRES = "INSERT INTO " + TABLE_GENRES + " VALUES(?, ?, ?)";
+
+    public static final String QUERY_MOVIE_BY_NAME = "SELECT " + COLUMN_MOVIE_ID + " FROM " + TABLE_MOVIES +
+            " WHERE " + COLUMN_MOVIE_NAME + " = ? ";
+    public static final String QUERY_ACTOR_BY_NAME = "SELECT " + COLUMN_ACTOR_ID + " FROM " + TABLE_ACTORS +
+            " WHERE " + COLUMN_ACTOR_NAME + " = ? ";
+    public static final String QUERY_GENRE = "SELECT " + COLUMN_GENRE_ID + " FROM " + TABLE_GENRES +
+            " WHERE " + COLUMN_GENRE_NAME + " = ? ";
+    private PreparedStatement insertIntoMovies;
+    private PreparedStatement insertIntoActors;
+    private PreparedStatement insertIntoGenres;
+
+    private PreparedStatement queryMovie;
+    private PreparedStatement queryActor;
+    private PreparedStatement queryGenre;
+
     public boolean openConn(){
         try {
             connection = DriverManager.getConnection(CONNECTION_PATH);
+            queryMovie = connection.prepareStatement(QUERY_MOVIE_BY_NAME);
+            queryActor = connection.prepareStatement(QUERY_ACTOR_BY_NAME);
+            queryGenre = connection.prepareStatement(QUERY_GENRE);
+            insertIntoMovies = connection.prepareStatement(INSERT_INTO_MOVIES, Statement.RETURN_GENERATED_KEYS);
+            insertIntoActors = connection.prepareStatement(INSERT_INTO_ACTORS, Statement.RETURN_GENERATED_KEYS);
+            insertIntoGenres = connection.prepareStatement(INSERT_INTO_GENRES, Statement.RETURN_GENERATED_KEYS);
             return true;
         } catch (SQLException e){
             System.out.println(e.getMessage());
@@ -113,4 +134,45 @@ public class DataSource {
             }
         }
     }
+
+    public int queryMovie(String name) throws SQLException{
+        queryMovie.setString(1, name);
+        ResultSet resultSet = queryMovie.executeQuery();
+        if (resultSet.next()){
+            return resultSet.getInt(1);
+        } else return -1;
+    }
+
+    public int queryActor(String name) throws SQLException{
+        queryActor.setString(1, name);
+        ResultSet resultSet = queryActor.executeQuery();
+        if (resultSet.next()){
+            return resultSet.getInt(1);
+        } else {
+            return -1;
+        }
+    }
+
+    public int queryGenre(String name) throws SQLException{
+        queryGenre.setString(1, name);
+        ResultSet resultSet = queryGenre.executeQuery();
+        if (resultSet.next()){
+            return resultSet.getInt(1);
+        } else {
+            return -1;
+        }
+    }
+
+
+   /* public boolean insertIntoMovies(int id, String name, double rating){
+        if (id < 1 || name == null || rating < 1.0d || rating > 5.0d){
+            return false;
+        }
+        try {
+
+        }
+    }
+    public boolean insertIntoActors(int id, String name, int movie){
+
+    }*/
 }
