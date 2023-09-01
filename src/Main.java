@@ -9,9 +9,9 @@ public class Main {
         if (!isOpen) {
             System.out.println("Cannot open the connection");
         }
-        /*dataSource.dropTable("actors");
+        dataSource.dropTable("actors");
         dataSource.dropTable("movies");
-        dataSource.dropTable("genres");*/
+        dataSource.dropTable("genres");
         dataSource.createTables();
         dataSource.execute("CREATE TABLE IF NOT EXISTS awards (award BOOLEAN NOT NULL CHECK (award IN (0,1)))");
         System.out.println(dataSource.queryMovie("FlyBoys"));
@@ -23,9 +23,24 @@ public class Main {
         System.out.println(dataSource.insertIntoActors("Jennifer Decker", 1));
         System.out.println(dataSource.insertIntoActors("Jean Reno", 1));
         System.out.println(dataSource.insertIntoGenres(1, "Action"));
-        System.out.println(dataSource.insertIntoGenres(1, "Drama"));
+        //System.out.println(dataSource.insertIntoGenres(1, "Drama"));
 
-        dataSource.execute("CREATE TABLE IF NOT EXISTS awards (award BOOLEAN NOT NULL CHECK (award IN (0,1)))");
+        dataSource.insert("Todd Boyce", "FlyBoys", "Drama", 5.0d);
+        dataSource.insert("Oscar Isaac", "Ex-Machina", "Drama", 7.7d);
+        dataSource.insert("Oscar Isaac", "A Most Violent Year", "Action", 7.0d);
+        dataSource.insert("Jessica Chastain", "A Most Violent Year", "Crime", 7.0d);
+        dataSource.insert("Timothée Chalamet", "Dune", "Action", 7.0d);
+        dataSource.insert("Rebecca Ferguson", "Dune", "Adventure", 7.0d);
+        dataSource.insert("Zendaya", "Dune", "Drama", 7.0d);
+        dataSource.insert("Oscar Isaac", "Dune", "Sci-Fi", 7.0d);
+        dataSource.insert("Jason Momoa", "Dune", "Sci-Fi", 7.0d);
+
+        System.out.println(dataSource.queryGenresForAMovie(1));
+        System.out.println(dataSource.queryGenresForAMovie(2));
+        System.out.println(dataSource.queryGenresForAMovie(3));
+        System.out.println(dataSource.queryGenresForAMovie(4));
+
+        //dataSource.execute("CREATE TABLE IF NOT EXISTS awards (award BOOLEAN NOT NULL CHECK (award IN (0,1)))");
         //dataSource.dropTable("awards");
 
         if (isOpen) {
