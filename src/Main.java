@@ -1,6 +1,8 @@
 import db.DataSource;
+import db.Movie;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
@@ -39,6 +41,17 @@ public class Main {
         System.out.println(dataSource.queryGenresForAMovie(2));
         System.out.println(dataSource.queryGenresForAMovie(3));
         System.out.println(dataSource.queryGenresForAMovie(4));
+
+        System.out.println("------------------------------------");
+        List<Movie> movies = dataSource.queryMovies();
+        if (movies.isEmpty()){
+            System.out.println("There are no movies in the DB.");
+        } else {
+            for (Movie movie : movies){
+                System.out.printf("%03d - %20s - %.2f\n", movie.get_id(), movie.getName(), movie.getRating());
+            }
+        }
+
 
         //dataSource.execute("CREATE TABLE IF NOT EXISTS awards (award BOOLEAN NOT NULL CHECK (award IN (0,1)))");
         //dataSource.dropTable("awards");

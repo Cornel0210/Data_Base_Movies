@@ -1,5 +1,6 @@
 package db;
 
+import javax.swing.plaf.ListUI;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -46,6 +47,7 @@ public class DataSource {
             " WHERE " + COLUMN_ACTOR_NAME + " = ?";
     public static final String QUERY_ACTOR_MOVIE = "SELECT " + COLUMN_ACTOR_ID + " FROM " + TABLE_ACTORS +
             " WHERE " + COLUMN_ACTOR_NAME + " = ? AND " + COLUMN_ACTOR_MOVIE + " = ?";
+    public static final String QUERY_MOVIES = "SELECT * FROM " + TABLE_MOVIES;
     private PreparedStatement insertIntoMovies;
     private PreparedStatement insertIntoActors;
     private PreparedStatement insertIntoGenres;
@@ -160,6 +162,26 @@ public class DataSource {
         if (resultSet.next()){
             return resultSet.getInt(1);
         } else return -1;
+    }
+    public List<Movie> queryMovies(){
+        Statement statement;
+        try {
+            statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(QUERY_MOVIES);
+            List<Movie> movies = new LinkedList<>();
+            while (resultSet.next()){
+                Movie movie = new Movie();
+                movie.set_id(resultSet.getInt(1));
+                movie.setName(resultSet.getString(2));
+                movie.setRating(resultSet.getDouble(3));
+                movies.add(movie);
+            }
+            return movies;
+        } catch (SQLException e){
+            System.out.println("QueryMovies: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public int queryActor(String name) throws SQLException{
