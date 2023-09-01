@@ -1,3 +1,5 @@
+package db;
+
 public class Movie {
     private int _id;
     private String name;
