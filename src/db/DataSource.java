@@ -23,12 +23,15 @@ public class DataSource {
     public static final String COLUMN_GENRE_NAME = "genre";
     public static final String COLUMN_GENRE_MOVIE = "movie";
 
-    public static final String INSERT_INTO_MOVIES = "INSERT INTO " + TABLE_MOVIES + " VALUES(?, ?, ?)";
-    public static final String INSERT_INTO_ACTORS = "INSERT INTO " + TABLE_ACTORS + " VALUES(?, ?, ?)";
-    public static final String INSERT_INTO_GENRES = "INSERT INTO " + TABLE_GENRES + " VALUES(?, ?, ?)";
+    public static final String INSERT_INTO_MOVIES = "INSERT INTO " + TABLE_MOVIES +
+            " (" + COLUMN_MOVIE_NAME + ", " + COLUMN_MOVIE_RATING + ") VALUES(?, ?)";
+    public static final String INSERT_INTO_ACTORS = "INSERT INTO " + TABLE_ACTORS +
+            " (" + COLUMN_ACTOR_NAME + ", " + COLUMN_ACTOR_MOVIE + ") VALUES(?, ?)";
+    public static final String INSERT_INTO_GENRES = "INSERT INTO " + TABLE_GENRES +
+            " (" + COLUMN_GENRE_MOVIE + ", " + COLUMN_GENRE_NAME + ") VALUES(?, ?)";
 
     public static final String QUERY_MOVIE_BY_NAME = "SELECT " + COLUMN_MOVIE_ID + " FROM " + TABLE_MOVIES +
-            " WHERE " + COLUMN_MOVIE_NAME + " = ? ";
+            " WHERE " + COLUMN_MOVIE_NAME + " = ? COLLATE NOCASE";
     public static final String QUERY_ACTOR_BY_NAME = "SELECT " + COLUMN_ACTOR_ID + " FROM " + TABLE_ACTORS +
             " WHERE " + COLUMN_ACTOR_NAME + " = ? ";
     public static final String QUERY_GENRE = "SELECT " + COLUMN_GENRE_ID + " FROM " + TABLE_GENRES +
@@ -74,13 +77,13 @@ public class DataSource {
         try {
             statement = connection.createStatement();
             statement.execute("CREATE TABLE IF NOT EXISTS " + TABLE_ACTORS +
-                    " (" + COLUMN_ACTOR_ID + " INTEGER NOT NULL, " + COLUMN_ACTOR_NAME + " TEXT NOT NULL, " +
+                    " (" + COLUMN_ACTOR_ID + " INTEGER PRIMARY KEY, " + COLUMN_ACTOR_NAME + " TEXT NOT NULL, " +
                     COLUMN_ACTOR_MOVIE + " INTEGER NOT NULL)");
             statement.execute("CREATE TABLE IF NOT EXISTS " + TABLE_MOVIES +
-                    "(" + COLUMN_MOVIE_ID + " INTEGER NOT NULL, " + COLUMN_MOVIE_NAME + " TEXT NOT NULL, " +
+                    "(" + COLUMN_MOVIE_ID + " INTEGER PRIMARY KEY, " + COLUMN_MOVIE_NAME + " TEXT NOT NULL, " +
                     COLUMN_MOVIE_RATING + " REAL)");
             statement.execute("CREATE TABLE IF NOT EXISTS " + TABLE_GENRES +
-                    "(" + COLUMN_GENRE_ID + " INTEGER NOT NULL, " + COLUMN_GENRE_MOVIE + " INTEGER NOT NULL, " +
+                    "(" + COLUMN_GENRE_ID + " INTEGER PRIMARY KEY, " + COLUMN_GENRE_MOVIE + " INTEGER NOT NULL, " +
                     COLUMN_GENRE_NAME + " TEXT NOT NULL)");
         } catch (SQLException e){
             System.out.println("createTables error: " + e.getMessage());
@@ -164,15 +167,92 @@ public class DataSource {
     }
 
 
-   /* public boolean insertIntoMovies(int id, String name, double rating){
-        if (id < 1 || name == null || rating < 1.0d || rating > 5.0d){
-            return false;
+    public int insertIntoMovies(String name, double rating){
+        if (name == null || rating < 1.0d || rating > 10.0d){
+            return -1;
         }
         try {
-
+            if (queryMovie(name) > 0){
+                return -1;
+            }
+            insertIntoMovies.setString(1, name);
+            insertIntoMovies.setDouble(2, rating);
+            int affectedRows = insertIntoMovies.executeUpdate();
+            if (affectedRows != 1){
+                throw new SQLException("Couldn't insert the movie.");
+            }
+            ResultSet resultSet = insertIntoMovies.getGeneratedKeys();
+            if (resultSet.next()){
+                return resultSet.getInt(1);
+            } else {
+                throw new SQLException("insertIntoMovies: Fatal Error.");
+            }
+        } catch (SQLException e){
+            System.out.println("insertIntoMovies: " + e.getMessage());
+            e.printStackTrace();
         }
+        return -1;
     }
-    public boolean insertIntoActors(int id, String name, int movie){
+    public int insertIntoActors(String name, int movie){
+        if ( name == null || movie < 1){
+            return -1;
+        }
+        try {
+            if (queryActor(name) > 0) {
+                return -1;
+            }
+            insertIntoActors.setString(1, name);
+            insertIntoActors.setInt(2, movie);
+            int affectedRows = insertIntoActors.executeUpdate();
+            if (affectedRows != 1){
+                throw new SQLException("Couldn't insert the actor.");
+            }
+            ResultSet resultSet = insertIntoMovies.getGeneratedKeys();
+            if (resultSet.next()){
+                return resultSet.getInt(1);
+            } else {
+                throw new SQLException("insertIntoActors: Fatal Error.");
+            }
+        } catch (SQLException e) {
+            System.out.println("insertIntoActors: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return -1;
+    }
 
+    public int insertIntoGenres(int movie, String genre){
+        if (movie < 1 || genre == null){
+            return -1;
+        }
+        try {
+            if (queryGenre(genre) > 0) {
+                return -1;
+            }
+            insertIntoGenres.setInt(1, movie);
+            insertIntoGenres.setString(2, genre);
+            int affectedRows = insertIntoGenres.executeUpdate();
+            if (affectedRows != 1){
+                throw new SQLException("Couldn't insert the genre.");
+            }
+            ResultSet resultSet = insertIntoMovies.getGeneratedKeys();
+            if (resultSet.next()){
+                return resultSet.getInt(1);
+            } else {
+                throw new SQLException("insertIntoGenres: Fatal Error.");
+            }
+        } catch (SQLException e){
+            System.out.println("insertIntoGenres: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    /*public void insert(String actor, String movie, String genre, double rating){
+        if (actor == null || movie == null || genre == null || rating < 1.0d || rating >10.0d){
+            System.out.println("Couldn't make the insertion.");
+        }
+        if (queryMovie(movie) < 1){
+            insertIntoMovies()
+        }
     }*/
 }
