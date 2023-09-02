@@ -1,8 +1,6 @@
 package db;
 
-import javax.swing.plaf.ListUI;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -384,6 +382,36 @@ public class DataSource {
             } catch (SQLException e){
                 System.out.println("Couldn't set autoCommit to true.");
             }
+        }
+    }
+
+    public List<MovieAllDetails> getMovieDetails(){
+        String cmd = "SELECT " + TABLE_MOVIES + "." + COLUMN_MOVIE_NAME + " AS movie, " + TABLE_ACTORS + "." + COLUMN_ACTOR_NAME + " AS actor, " +
+                TABLE_GENRES + "." + COLUMN_GENRE_NAME + ", " + TABLE_MOVIES + "." + COLUMN_MOVIE_RATING +
+                " FROM " + TABLE_MOVIES + " JOIN " + TABLE_ACTORS + " ON " + TABLE_MOVIES + "." + COLUMN_MOVIE_ID + " = " +
+                TABLE_ACTORS + "." + COLUMN_ACTOR_MOVIE +
+                " JOIN " + TABLE_GENRES + " ON " + TABLE_GENRES + "." + COLUMN_GENRE_MOVIE + " = " + TABLE_MOVIES + "." + COLUMN_MOVIE_ID +
+                " ORDER BY " + TABLE_MOVIES + "." + COLUMN_MOVIE_NAME;
+        System.out.println(cmd);
+        Statement statement;
+        try {
+            statement = connection.createStatement();
+            statement.execute(cmd);
+            ResultSet resultSet = statement.getResultSet();
+            List<MovieAllDetails> list = new LinkedList<>();
+            while (resultSet.next()){
+                MovieAllDetails movie = new MovieAllDetails();
+                movie.setMovie(resultSet.getString(1));
+                movie.setActor(resultSet.getString(2));
+                movie.setGenre(resultSet.getString(3));
+                movie.setRating(resultSet.getDouble(4));
+                list.add(movie);
+            }
+            return list;
+        } catch (SQLException e){
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            return null;
         }
     }
 }

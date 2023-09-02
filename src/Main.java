@@ -1,5 +1,6 @@
 import db.DataSource;
 import db.Movie;
+import db.MovieAllDetails;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -15,7 +16,8 @@ public class Main {
         dataSource.dropTable("movies");
         dataSource.dropTable("genres");
         dataSource.createTables();
-        dataSource.execute("CREATE TABLE IF NOT EXISTS awards (award BOOLEAN NOT NULL CHECK (award IN (0,1)))");
+        //dataSource.execute("CREATE TABLE IF NOT EXISTS awards (award BOOLEAN NOT NULL CHECK (award IN (0,1)))");
+        dataSource.dropTable("awards");
         System.out.println(dataSource.queryMovie("FlyBoys"));
         System.out.println(dataSource.queryActor("James Franco"));
         System.out.println(dataSource.queryGenre("Action"));
@@ -49,6 +51,17 @@ public class Main {
         } else {
             for (Movie movie : movies){
                 System.out.printf("%03d - %20s - %.2f\n", movie.get_id(), movie.getName(), movie.getRating());
+            }
+        }
+
+        System.out.println("------------------------------------");
+        List<MovieAllDetails> movieDetails = dataSource.getMovieDetails();
+        if (movieDetails == null){
+            System.out.println("There are no movies.");
+        } else {
+            for (MovieAllDetails element : movieDetails){
+                System.out.printf("%-20s - %-20s - %-10s - %.2f\n", element.getMovie(), element.getActor(), element.getGenre(),
+                        element.getRating());
             }
         }
 
